@@ -431,18 +431,20 @@ console.log("TODO 11 \n Average price : ", average_price, "\n p5 price : ", p5_p
 // A very old item is an item `published` more than 3 weeks ago.
 let b = false;
 let old_item = NaN;
-for (let i in VINTED){
-  if (i.published < new Date(Date.now() - 3 * 7 * 24 * 60 * 60 * 1000)){
+for (let i = 0; i < VINTED.length; i++){
+  if (new Date(new Date().getTime()) - new Date(VINTED[i].published) > 3 * 7 * 24 * 60 * 60 * 1000){
     b = true;
-    old_item = i;
+    old_item = VINTED[i];
     break;
   }
 }
-console.log("TODO 12 \n Is there an item published more than 3 weeks ago ? ", b, "\n ", old_item)
+console.log("TODO 12 \n Is there an item published more than 3 weeks ago ? ", b, old_item)
 
 // 🎯 TODO 13: Find a specific item
 // 1. Find the item with the uuid `f2c5377c-84f9-571d-8712-98902dcbb913`
 // 2. Log the item
+const specific__item = VINTED.find(item => item.uuid === 'f2c5377c-84f9-571d-8712-98902dcbb913');
+console.log("TODO 13 \n Specific item : ", specific__item);
 
 // 🎯 TODO 14: Delete a specific item
 // 1. Delete the item with the uuid `f2c5377c-84f9-571d-8712-98902dcbb913`
