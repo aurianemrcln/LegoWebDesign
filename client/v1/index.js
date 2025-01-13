@@ -29,6 +29,8 @@ console.log(MY_FAVORITE_DEALERS[0]);
 // 0. I have 2 favorite lego sets shopping communities stored in MY_FAVORITE_DEALERS variable
 // 1. Create a new variable and assign it the link of the lego set with the highest reduction I can find on these 2 websites
 // 2. Log the variable
+const link_highest_reduction = 'https://www.dealabs.com/bons-plans/lego-marvel-super-heroes-2-switch-demat-2974630';
+console.log("TODO 1 \n link of the Lego set with the highest reduction : ", link_highest_reduction);
 
 /**
  * 🧱
@@ -42,29 +44,49 @@ console.log(MY_FAVORITE_DEALERS[0]);
 // 🎯 TODO 2: Number of deals
 // 1. Create a variable and assign it the number of deals
 // 2. Log the variable
+const number_of_deals = deals.length;
+console.log("TODO 2 \n Number of deals : ", number_of_deals);
 
 // 🎯 TODO 3: Website name
 // 1. Create a variable and assign it the list of shopping community name only
 // 2. Log the variable
 // 3. Log how many shopping communities we have
+const list_of_all_shopping_community = deals.map(deal => deal.community);
+const list_of_unique_shopping_community = deals.map(deal => deal.community).filter((value, index, self) => self.indexOf(value) === index);
+console.log("TODO 3 \n List of shopping community : ", list_of_all_shopping_community);
+console.log(" Number of shopping community : ", list_of_unique_shopping_community.length);
 
 // 🎯 TODO 4: Sort by price
 // 1. Create a function to sort the deals by price
 // 2. Create a variable and assign it the list of sets by price from lowest to highest
 // 3. Log the variable
+function sort_by_price(deals){
+  return deals.sort((a, b) => a.price - b.price);
+}
+const sorted_deals_by_price = sort_by_price(deals);
+console.log("TODO 4 \n Sorted deals by price : ", sorted_deals_by_price);
 
 // 🎯 TODO 5: Sort by date
 // 1. Create a function to sort the deals by date
 // 2. Create a variable and assign it the list of deals by date from recent to old
 // 3. Log the variable
+function sort_by_date(deals){
+  return deals.sort((a, b) => new Date(b.published) - new Date(a.published));
+}
+const sorted_deals_by_date = sort_by_date(deals);
+console.log("TODO 5 \n Sorted deals by date : ", sorted_deals_by_date);
 
 // 🎯 TODO 6: Filter a specific percentage discount range
 // 1. Filter the list of deals between 50% and 75%
 // 2. Log the list
+const filtered_deals_by_discount = deals.filter(deal => deal.discount >= 50 && deal.discount <= 75);
+console.log("TODO 6 \n Filtered deals by discount between 50% and 75% : ", filtered_deals_by_discount);
 
 // 🎯 TODO 7: Average percentage discount
 // 1. Determine the average percentage discount of the deals
 // 2. Log the average
+const average_discount = deals.reduce((acc, deal) => acc + deal.discount, 0) / deals.length;
+console.log("TODO 7 \n Average percentage discount : ", average_discount);
 
 /**
  * 🏎
@@ -88,15 +110,26 @@ console.log(MY_FAVORITE_DEALERS[0]);
 //
 // 2. Log the variable
 // 3. Log the number of deals by community
+const communities = {
+  'Dealabs': deals.filter(deal => deal.community === 'dealabs'),
+  'Avenue de la brique': deals.filter(deal => deal.community === 'avenuedelabrique')
+}
+console.log("TODO 8 \n Deals by community : ", communities);
+console.log(" Number of deals by community : \n  Dealabs : ", communities['Dealabs'].length, "\n  Avenue de la brique : ", communities['Avenue de la brique'].length);
 
 // 🎯 TODO 9: Sort by price for each community
 // 1. For each community, sort the deals by discount price, from highest to lowest
 // 2. Log the sort
+const sorted_Dealabs_by_price = sort_by_price(communities['Dealabs']);
+const sorted_Avenue_de_la_brique_by_price = sort_by_price(communities['Avenue de la brique']);
+console.log("TODO 9 \n Sorted deals by price for each community : \n  Dealabs : ", sorted_Dealabs_by_price, "\n  Avenue de la brique : ", sorted_Avenue_de_la_brique_by_price);
 
 // 🎯 TODO 10: Sort by date for each community
 // 1. For each set, sort the deals by date, from old to recent
 // 2. Log the sort
-
+const sorted_Dealabs_by_date = sort_by_date(communities['Dealabs']);
+const sorted_Avenue_de_la_brique_by_date = sort_by_date(communities['Avenue de la brique']);
+console.log("TODO 10 \n Sorted deals by date for each community : \n  Dealabs : ", sorted_Dealabs_by_date, "\n  Avenue de la brique : ", sorted_Avenue_de_la_brique_by_date);
 
 /**
  * 🧥
@@ -388,10 +421,24 @@ const VINTED = [
 // 2. Compute the p5 price value of the listing
 // 3. Compute the p25 price value of the listing
 // The p25 value (25th percentile) is the lower value expected to be exceeded in 25% of the vinted items
+const average_price = VINTED.reduce((acc, item) => acc + parseFloat(item.price), 0) / VINTED.length;
+const p5_price = VINTED.sort((a, b) => parseFloat(a.price) - parseFloat(b.price))[Math.floor(VINTED.length * 0.05)].price;
+const p25_price = VINTED.sort((a, b) => parseFloat(a.price) - parseFloat(b.price))[Math.floor(VINTED.length * 0.25)].price;
+console.log("TODO 11 \n Average price : ", average_price, "\n p5 price : ", p5_price, "\n p25 price : ", p25_price);
 
 // 🎯 TODO 12: Very old listed items
-// // 1. Log if we have very old items (true or false)
-// // A very old item is an item `published` more than 3 weeks ago.
+// 1. Log if we have very old items (true or false)
+// A very old item is an item `published` more than 3 weeks ago.
+let b = false;
+let old_item = NaN;
+for (let i in VINTED){
+  if (i.published < new Date(Date.now() - 3 * 7 * 24 * 60 * 60 * 1000)){
+    b = true;
+    old_item = i;
+    break;
+  }
+}
+console.log("TODO 12 \n Is there an item published more than 3 weeks ago ? ", b, "\n ", old_item)
 
 // 🎯 TODO 13: Find a specific item
 // 1. Find the item with the uuid `f2c5377c-84f9-571d-8712-98902dcbb913`
@@ -401,7 +448,7 @@ const VINTED = [
 // 1. Delete the item with the uuid `f2c5377c-84f9-571d-8712-98902dcbb913`
 // 2. Log the new list of items
 
-// 🎯 TODO 5: Save a favorite item
+// 🎯 TODO 15: Save a favorite item
 // We declare and assign a variable called `sealedCamera`
 let sealedCamera = {
   link: "https://www.vinted.fr/items/5563396347-lego-43230-omaggio-a-walter-disney-misb",
