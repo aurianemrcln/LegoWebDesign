@@ -469,7 +469,9 @@ let camera = sealedCamera;
 camera.favorite = true;
 
 // 1. Log `sealedCamera` and `camera` variables
+console.log("TODO 15 \n sealedCamera : ", sealedCamera, "\n camera : ", camera);
 // 2. What do you notice?
+// The favorite = true is added to the camera AND the sealedCamera
 
 // we make (again) a new assignment again
 sealedCamera = {
@@ -481,9 +483,11 @@ sealedCamera = {
 };
 
 // 3. Update `camera` property with `favorite` to true WITHOUT changing sealedCamera properties
+let camera2 = structuredClone(sealedCamera);
+camera2.favorite = true;
+console.log("TODO 15 \n sealedCamera : ", sealedCamera, "\n camera : ", camera2)
 
-
-// 🎯 TODO 11: Compute the profitability
+// 🎯 TODO 16: Compute the profitability
 // From a specific deal called `deal`
 const deal = {
   'title':  'La caméra Hommage à Walt Disney',
