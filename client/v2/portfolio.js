@@ -31,6 +31,7 @@ const selectPage = document.querySelector('#page-select');
 const selectLegoSetIds = document.querySelector('#lego-set-id-select');
 const sectionDeals= document.querySelector('#deals');
 const spanNbDeals = document.querySelector('#nbDeals');
+const filterDiscount = document.querySelector('#discount-filter');
 
 /**
  * Set global value
@@ -46,6 +47,7 @@ const setCurrentDeals = ({result, meta}) => {
  * Fetch deals from api
  * @param  {Number}  [page=1] - current page to fetch
  * @param  {Number}  [size=12] - size of the page
+ * @param  {Number}  [discount=0] - minimum discount percentage to filter deals
  * @return {Object}
  */
 const fetchDeals = async (page = 1, size = 6) => {
@@ -60,7 +62,8 @@ const fetchDeals = async (page = 1, size = 6) => {
       return {currentDeals, currentPagination};
     }
 
-    return body.data;
+    const sortedDeals = body.data.result.sort((a, b) => b.discount - a.discount);
+    return { result: sortedDeals, meta: body.data.meta };
   } catch (error) {
     console.error(error);
     return {currentDeals, currentPagination};
@@ -69,7 +72,7 @@ const fetchDeals = async (page = 1, size = 6) => {
 
 /**
  * Render list of deals
- * @param  {Array} deals
+ * @param {Array} deals
  */
 const renderDeals = deals => {
   const fragment = document.createDocumentFragment();
@@ -81,6 +84,7 @@ const renderDeals = deals => {
         <span>${deal.id}</span>
         <a href="${deal.link}">${deal.title}</a>
         <span>${deal.price}</span>
+        <span>${deal.discount}% off</span>
       </div>
     `;
     })
@@ -161,9 +165,13 @@ selectPage.addEventListener('change', async (event) => {
   render(currentDeals, currentPagination);
 });
 
+/**
+ * Initialize application on page load
+ */
 document.addEventListener('DOMContentLoaded', async () => {
   const deals = await fetchDeals();
 
   setCurrentDeals(deals);
   render(currentDeals, currentPagination);
 });
+
