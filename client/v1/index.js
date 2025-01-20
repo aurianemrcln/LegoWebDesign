@@ -510,3 +510,5 @@ const deal = {
 // 🎯 LAST TODO: Save in localStorage
 // 1. Save MY_FAVORITE_DEALERS in the localStorage
 // 2. log the localStorage
+const localStorage = MY_FAVORITE_DEALERS;
+console.log("LAST TODO \n localStorage : ", localStorage);
