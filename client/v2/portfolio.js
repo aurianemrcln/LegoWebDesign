@@ -62,8 +62,7 @@ const fetchDeals = async (page = 1, size = 6) => {
       return {currentDeals, currentPagination};
     }
 
-    const sortedDeals = body.data.result.sort((a, b) => b.discount - a.discount);
-    return { result: sortedDeals, meta: body.data.meta };
+    return body.data;
   } catch (error) {
     console.error(error);
     return {currentDeals, currentPagination};
@@ -175,3 +174,48 @@ document.addEventListener('DOMContentLoaded', async () => {
   render(currentDeals, currentPagination);
 });
 
+// Feature 2 - Filter by best discount
+const filterDiscountButton = document.querySelector('#filters button:first-of-type');
+filterDiscountButton.addEventListener('click', async () => {
+  const deals = await fetchDeals(currentPagination.currentPage, selectShow.value);
+
+  // Filtrer les deals avec un discount supérieur à 50%
+  const filteredDeals = deals.result.filter(deal => deal.discount > 50);
+
+  // Mettre à jour la pagination locale pour refléter les résultats filtrés
+  const filteredPagination = {
+    ...currentPagination,
+    count: filteredDeals.length,
+    pageCount: Math.ceil(filteredDeals.length / selectShow.value),
+  };
+
+  setCurrentDeals({ result: filteredDeals, meta: filteredPagination });
+  render(currentDeals, filteredPagination);
+});
+
+const sortSelect = document.querySelector('#sort-select');
+
+sortSelect.addEventListener('change', async (event) => {
+  const sortOption = event.target.value;
+
+  // Vérifie si l'utilisateur veut trier par meilleur discount
+  if (sortOption === 'price-asc') {
+    const sortedDeals = sortDealsByDiscount([...currentDeals], 'desc'); // Tri par meilleur discount
+    render(sortedDeals, currentPagination);
+  }
+});
+
+/**
+ * Sort deals by discount
+ * @param {Array} deals - List of deals
+ * @param {String} order - Order of sorting ('desc' for best discount first)
+ * @return {Array}
+ */
+const sortDealsByDiscount = (deals, order = 'desc') => {
+  return deals.sort((a, b) => {
+    if (order === 'desc') {
+      return b.discount - a.discount; // Tri décroissant
+    }
+    return a.discount - b.discount; // Tri croissant (si nécessaire dans le futur)
+  });
+};
