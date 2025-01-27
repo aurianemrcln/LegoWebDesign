@@ -82,10 +82,11 @@ const renderDeals = deals => {
       <div class="deal" id=${deal.uuid}>
         <span>${deal.id}</span>
         <a href="${deal.link}">${deal.title}</a>
-        <span>${deal.price}</span>
-        <span>${deal.discount}% off</span>
-        <span>${deal.comments} comments</span>
-        <span>${deal.temperature}°</span>
+        <span>${deal.price}€,</span>
+        <span>${deal.discount}% off,</span>
+        <span>${deal.comments} comments,</span>
+        <span>${deal.temperature}°,</span>
+        <span>${deal.published}</span>
       </div>
     `;
     })
@@ -201,7 +202,7 @@ sortSelect.addEventListener('change', async (event) => {
   const sortOption = event.target.value;
 
   // Vérifie si l'utilisateur veut trier par meilleur discount
-  if (sortOption === 'price-asc') {
+  if (sortOption === 'discount-asc') {
     const sortedDeals = sortDealsByDiscount([...currentDeals], 'desc'); // Tri par meilleur discount
     render(sortedDeals, currentPagination);
   }
@@ -307,5 +308,64 @@ const sortDealsByTemperature = (deals, order = 'desc') => {
       return b.temperature - a.temperature; // Tri décroissant
     }
     return a.temperature - b.temperature; // Tri croissant (si nécessaire)
+  });
+};
+
+
+// Feature 5 - Sort by price
+sortSelect.addEventListener('change', async (event) => {
+  const sortOption = event.target.value;
+
+  // Vérifie les différentes options de tri
+  if (sortOption === 'price-asc') {
+    const sortedDeals = sortDealsByPrice([...currentDeals], 'asc'); // Tri par prix croissant
+    render(sortedDeals, currentPagination);
+  } else if (sortOption === 'price-desc') {
+    const sortedDeals = sortDealsByPrice([...currentDeals], 'desc'); // Tri par prix décroissant
+    render(sortedDeals, currentPagination);
+  }
+});
+
+/**
+ * Sort deals by price
+ * @param {Array} deals - List of deals
+ * @param {String} order - Order of sorting ('asc' for cheapest first, 'desc' for most expensive first)
+ * @return {Array}
+ */
+const sortDealsByPrice = (deals, order = 'asc') => {
+  return deals.sort((a, b) => {
+    if (order === 'asc') {
+      return a.price - b.price; // Tri croissant
+    }
+    return b.price - a.price; // Tri décroissant
+  });
+};
+
+// Feature 6 - Sort by date
+sortSelect.addEventListener('change', async (event) => {
+  const sortOption = event.target.value;
+
+  // Vérifie les différentes options de tri
+  if (sortOption === 'date-asc') {
+    const sortedDeals = sortDealsByDate([...currentDeals], 'asc'); // Tri par date croissante
+    render(sortedDeals, currentPagination);
+  } else if (sortOption === 'date-desc') {
+    const sortedDeals = sortDealsByDate([...currentDeals], 'desc'); // Tri par date décroissante
+    render(sortedDeals, currentPagination);
+  }
+});
+
+/**
+ * Sort deals by price
+ * @param {Array} deals - List of deals
+ * @param {String} order - Order of sorting ('asc' for cheapest first, 'desc' for most expensive first)
+ * @return {Array}
+ */
+const sortDealsByDate = (deals, order = 'asc') => {
+  return deals.sort((a, b) => {
+    if (order === 'asc') {
+      return a.price - b.price; // Tri croissant
+    }
+    return b.price - a.price; // Tri décroissant
   });
 };
