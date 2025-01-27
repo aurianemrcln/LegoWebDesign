@@ -84,6 +84,7 @@ const renderDeals = deals => {
         <a href="${deal.link}">${deal.title}</a>
         <span>${deal.price}</span>
         <span>${deal.discount}% off</span>
+        <span>${deal.comments} comments</span>
       </div>
     `;
     })
@@ -219,3 +220,46 @@ const sortDealsByDiscount = (deals, order = 'desc') => {
     return a.discount - b.discount; // Tri croissant (si nécessaire dans le futur)
   });
 };
+
+
+// Feature 3 - Filter by most commented
+// Filtrer les offres avec plus de 15 commentaires
+const filterCommentsButton = document.querySelector('#filters button:nth-of-type(2)');
+filterCommentsButton.addEventListener('click', async () => {
+  const deals = await fetchDeals(currentPagination.currentPage, selectShow.value);
+
+  // Filtrer les deals avec plus de 15 commentaires
+  const filteredDeals = deals.result.filter(deal => deal.comments > 15);
+
+  // Mettre à jour la pagination locale pour refléter les résultats filtrés
+  const filteredPagination = {
+    ...currentPagination,
+    count: filteredDeals.length,
+    pageCount: Math.ceil(filteredDeals.length / selectShow.value),
+  };
+
+  setCurrentDeals({ result: filteredDeals, meta: filteredPagination });
+  render(currentDeals, filteredPagination);
+});
+
+// Trier les offres par nombre de commentaires
+const sortDealsByComments = (deals, order = 'desc') => {
+  return deals.sort((a, b) => {
+    if (order === 'desc') {
+      return b.comments - a.comments; // Tri décroissant
+    }
+    return a.comments - b.comments; // Tri croissant (si nécessaire)
+  });
+};
+
+const sortSelect2 = document.querySelector('#sort-select');
+sortSelect2.addEventListener('change', async (event) => {
+  const sortOption = event.target.value;
+
+  // Vérifie si l'utilisateur veut trier par nombre de commentaires
+  if (sortOption === 'comments-desc') {
+    const sortedDeals = sortDealsByComments([...currentDeals], 'desc');
+    render(sortedDeals, currentPagination);
+  }
+});
+
