@@ -85,6 +85,7 @@ const renderDeals = deals => {
         <span>${deal.price}</span>
         <span>${deal.discount}% off</span>
         <span>${deal.comments} comments</span>
+        <span>${deal.temperature}°</span>
       </div>
     `;
     })
@@ -263,3 +264,48 @@ sortSelect2.addEventListener('change', async (event) => {
   }
 });
 
+
+// Feature 4 - Filter by hot deals
+const filterHotDealsButton = document.querySelector('#filters button:nth-of-type(3)');
+filterHotDealsButton.addEventListener('click', async () => {
+  const deals = await fetchDeals(currentPagination.currentPage, selectShow.value);
+
+  // Filtrer les deals avec une température supérieure à 100
+  const filteredDeals = deals.result.filter(deal => deal.temperature > 100);
+
+  // Mettre à jour la pagination locale pour refléter les résultats filtrés
+  const filteredPagination = {
+    ...currentPagination,
+    count: filteredDeals.length,
+    pageCount: Math.ceil(filteredDeals.length / selectShow.value),
+  };
+
+  setCurrentDeals({ result: filteredDeals, meta: filteredPagination });
+  render(currentDeals, filteredPagination);
+});
+
+const sortSelect3 = document.querySelector('#sort-select');
+sortSelect3.addEventListener('change', async (event) => {
+  const sortOption = event.target.value;
+
+  // Vérifie si l'utilisateur veut trier par température décroissante
+  if (sortOption === 'temperature-desc') {
+    const sortedDeals = sortDealsByTemperature([...currentDeals], 'desc');
+    render(sortedDeals, currentPagination);
+  }
+});
+
+/**
+ * Sort deals by temperature
+ * @param {Array} deals - List of deals
+ * @param {String} order - Order of sorting ('desc' for highest temperature first)
+ * @return {Array}
+ */
+const sortDealsByTemperature = (deals, order = 'desc') => {
+  return deals.sort((a, b) => {
+    if (order === 'desc') {
+      return b.temperature - a.temperature; // Tri décroissant
+    }
+    return a.temperature - b.temperature; // Tri croissant (si nécessaire)
+  });
+};
