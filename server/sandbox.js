@@ -1,7 +1,7 @@
 /* eslint-disable no-console, no-process-exit */
-const avenuedelabrique = require('./websites/avenuedelabrique');
+const avenuedelabrique = require('./websites/dealabs');
 
-async function sandbox (website = 'https://www.avenuedelabrique.com/nouveautes-lego') {
+async function sandbox (website = 'https://www.dealabs.com/') {
   try {
     console.log(`🕵️‍♀️  browsing ${website} website`);
 
