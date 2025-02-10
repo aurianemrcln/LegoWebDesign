@@ -341,6 +341,7 @@ const sortDealsByPrice = (deals, order = 'asc') => {
   });
 };
 
+
 // Feature 6 - Sort by date
 sortSelect.addEventListener('change', async (event) => {
   const sortOption = event.target.value;
@@ -368,4 +369,120 @@ const sortDealsByDate = (deals, order = 'asc') => {
     }
     return b.price - a.price; // Tri décroissant
   });
+};
+
+
+// Feature 7 - Display Vinted sales
+const fetchSalesById = async (id) => {
+  try {
+    const response = await fetch(`https://lego-api-blue.vercel.app/sales?id=${id}`);
+    const body = await response.json();
+
+    if (!body.success) {
+      console.error(body);
+      return [];
+    }
+
+    return body.data;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
+const renderSales = (sales) => {
+  const sectionSales = document.querySelector('#sales');
+  sectionSales.innerHTML = '<h2>Sales</h2>'; // Réinitialisation de la section
+
+  if (sales.length === 0) {
+    sectionSales.innerHTML += '<p>No sales found for this Lego set.</p>';
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  sales.forEach(sale => {
+    const div = document.createElement('div');
+    div.classList.add('sale');
+    div.innerHTML = `
+      <p><strong>ID:</strong> ${sale.id}</p>
+      <p><strong>Price:</strong> ${sale.price}€</p>
+      <p><strong>Seller:</strong> ${sale.seller}</p>
+      <p><strong>Link:</strong> <a href="${sale.link}" target="_blank">View Sale</a></p>
+    `;
+    fragment.appendChild(div);
+  });
+
+  sectionSales.appendChild(fragment);
+};
+
+document.querySelector('#search-sales-button').addEventListener('click', async () => {
+  const legoSetId = document.querySelector('#lego-set-id-input').value.trim();
+  
+  if (!legoSetId) {
+    alert('Please enter a valid Lego set ID.');
+    return;
+  }
+
+  const sales = await fetchSalesById(legoSetId);
+  renderSales(sales);
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const deals = await fetchDeals();
+  setCurrentDeals(deals);
+  render(currentDeals, currentPagination);
+
+  // Ajoutez l'écouteur d'événement pour le bouton de recherche après le chargement du DOM
+  const searchButton = document.querySelector('#search-lego-button');
+  const searchInput = document.querySelector('#lego-set-id-input');
+
+  if (searchButton && searchInput) {
+    searchButton.addEventListener('click', async () => {
+      const legoSetId = searchInput.value.trim();
+      if (!legoSetId) return; // Empêche la requête si le champ est vide
+
+      try {
+        const response = await fetch(`https://lego-api-blue.vercel.app/sales?id=${legoSetId}`);
+        const body = await response.json();
+
+        if (body.success !== true) {
+          console.error(body);
+          return;
+        }
+
+        renderLegoSales(body.data); // Fonction pour afficher les ventes
+      } catch (error) {
+        console.error("Error fetching Lego sales:", error);
+      }
+    });
+  } else {
+    console.error("Search input or button not found in DOM");
+  }
+});
+
+const renderLegoSales = (sales) => {
+  const salesSection = document.querySelector('#deals');
+  salesSection.innerHTML = '<h2>Lego Sales</h2>'; // Titre de la section
+
+  if (sales.length === 0) {
+    salesSection.innerHTML += '<p>No sales found for this set.</p>';
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  sales.forEach(sale => {
+    const div = document.createElement('div');
+    div.classList.add('sale');
+    div.innerHTML = `
+      <p><strong>Set ID:</strong> ${sale.id}</p>
+      <p><strong>Price:</strong> ${sale.price}€</p>
+      <p><strong>Condition:</strong> ${sale.condition}</p>
+      <p><strong>Seller:</strong> ${sale.seller}</p>
+      <a href="${sale.link}" target="_blank">View on Vinted</a>
+      <hr>
+    `;
+    fragment.appendChild(div);
+  });
+
+  salesSection.appendChild(fragment);
 };
