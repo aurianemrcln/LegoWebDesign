@@ -457,4 +457,37 @@ selectLegoSetIds.addEventListener('change', async (event) => {
 const spanNbSales = document.querySelector('#nbSales');
 const renderIndicatorsSales = (sales) => {
   spanNbSales.innerHTML = sales.length;
+  spanP5Value.innerHTML = calculatePercentile(sales, 5);
+  spanP25Value.innerHTML = calculatePercentile(sales, 25);
+  spanP50Value.innerHTML = calculatePercentile(sales, 50);
 };
+
+
+// Feature 9 - average, p5, p25 and p50 price value indicators
+const spanP5Value = document.querySelector('#p5_value');
+const spanP25Value = document.querySelector('#p25_value');
+const spanP50Value = document.querySelector('#p50_value');
+
+function calculatePercentile(sales, percentile) {
+  if (sales.length === 0) {
+    return 0;
+  }
+  // Extract the prices from the sales array
+  const prices = sales.map(sale => sale.price);
+  // Sort the prices in ascending order
+  prices.sort((a, b) => a - b);
+  // Calculate the index for the desired percentile
+  const index = (percentile / 100) * (prices.length - 1);
+  // Get the lower and upper bounds
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  // If the index is an integer, return the price at that index
+  if (lower === upper) {
+    return prices[index];
+  }
+  // Otherwise, interpolate between the lower and upper bounds
+  const lowerValue = prices[lower];
+  const upperValue = prices[upper];
+
+  return lowerValue + (upperValue - lowerValue) * (index - lower);
+}
