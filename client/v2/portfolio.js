@@ -460,6 +460,7 @@ const renderIndicatorsSales = (sales) => {
   spanP5Value.innerHTML = calculatePercentile(sales, 5);
   spanP25Value.innerHTML = calculatePercentile(sales, 25);
   spanP50Value.innerHTML = calculatePercentile(sales, 50);
+  spanLifetimeValue.innerHTML = calculateLifetimeValue(sales);
 };
 
 
@@ -490,4 +491,26 @@ function calculatePercentile(sales, percentile) {
   const upperValue = prices[upper];
 
   return lowerValue + (upperValue - lowerValue) * (index - lower);
+}
+
+
+// Feature 10 - Lifetime value
+const spanLifetimeValue = document.querySelector('#LifeTimeValue');
+
+function calculateLifetimeValue(sales) {
+  if (sales.length === 0) {
+    return 0;
+  }
+
+  const now = new Date();
+  let totalDays = 0;
+
+  sales.forEach(sale => {
+    const publishedDate = new Date(sale.published);
+    const differenceInTime = now - publishedDate;
+    const differenceInDays = differenceInTime / (1000 * 3600 * 24); // Convert milliseconds to days
+    totalDays += differenceInDays;
+  });
+
+  return totalDays / sales.length;
 }
