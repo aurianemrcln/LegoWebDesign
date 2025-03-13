@@ -26,11 +26,7 @@ async function start (){
 
 const queue = new Queue({'concurrency': 1});
 const LEGO_SET_IDS = [
-    '42182', '60363', '43231', '75403', '75404', '21034', '42635',
-    '75404', '76266', '72176', '42635', '71460', '42202', '40524',
-    '75402', '76262'
-  
-  ]
+    '42182', '60363', '43231', '75403']
 let SALES = {};
 
 async function goVinted(){
