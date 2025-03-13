@@ -417,14 +417,19 @@ const fetchSales = async (id = 42182) => {
  * @param  {Array} sales
  */
 const renderSales = sales => {
+  if (!sectionSales) {
+    console.error("Section 'Sales' not found in the DOM.");
+    return;
+  }
+
   const fragment = document.createDocumentFragment();
   const div = document.createElement('div');
   const template = sales
     .map(sale => {
       return `
-      <div class="Sales" id=${sale.uuid}>
-        <a href="${sale.link}">${sale.title}</a>
-        <span>${sale.price}</span>
+      <div class="sale" id=${sale.uuid},>
+        <a href="${sale.link}" target="_blank">${sale.title}</a>
+        <span>${sale.price}€,</span>
         <span>${sale.published}</span>
       </div>
     `;
@@ -518,3 +523,7 @@ function calculateLifetimeValue(sales) {
 
 // Feature 11 - Open product link
 // ajout de target="_blank" à renderDeals pour ouvrir dans un nouvel onglet
+
+
+// Feature 12 - Open sold item link
+// ajout de target="_blank" à renderSales pour ouvrir dans un nouvel onglet
