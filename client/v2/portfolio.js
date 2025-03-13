@@ -87,6 +87,7 @@ const renderDeals = deals => {
         <span>${deal.comments} comments,</span>
         <span>${deal.temperature}°,</span>
         <span>${deal.published}</span>
+        <button class="favorite-btn" data-id="${deal.uuid}">❤️</button>
       </div>
     `;
     })
@@ -96,6 +97,11 @@ const renderDeals = deals => {
   fragment.appendChild(div);
   sectionDeals.innerHTML = '<h2>Deals</h2>';
   sectionDeals.appendChild(fragment);
+
+  // Ajouter des écouteurs d'événements aux boutons favoris
+  document.querySelectorAll('.favorite-btn').forEach(button => {
+    button.addEventListener('click', handleFavoriteClick);
+  });
 };
 
 /**
@@ -527,3 +533,59 @@ function calculateLifetimeValue(sales) {
 
 // Feature 12 - Open sold item link
 // ajout de target="_blank" à renderSales pour ouvrir dans un nouvel onglet
+
+
+// Feature 13 - Save as favorite
+let favoriteDeals = [];
+
+/**
+ * Handle favorite button click
+ * @param {Event} event
+ */
+const handleFavoriteClick = event => {
+  const dealId = event.target.getAttribute('data-id');
+  const deal = currentDeals.find(d => d.uuid === dealId);
+
+  if (deal) {
+    const isFavorite = favoriteDeals.some(fav => fav.uuid === dealId);
+    if (isFavorite) {
+      // Retirer le deal des favoris
+      favoriteDeals = favoriteDeals.filter(fav => fav.uuid !== dealId);
+    } else {
+      // Ajouter le deal aux favoris
+      favoriteDeals.push(deal);
+    }
+    renderFavorites();
+    renderDeals(currentDeals); // Re-render deals to update button text
+  }
+};
+
+/**
+ * Render favorite deals
+ */
+const renderFavorites = () => {
+  const favoriteSection = document.querySelector('#favorites');
+  const fragment = document.createDocumentFragment();
+  const div = document.createElement('div');
+  const template = favoriteDeals
+    .map(deal => {
+      return `
+      <div class="deal" id=${deal.uuid}>
+        <span>${deal.id}</span>
+        <a href="${deal.link}" target="_blank">${deal.title}</a>
+        <span>${deal.price}€,</span>
+        <span>${deal.discount}% off,</span>
+        <span>${deal.comments} comments,</span>
+        <span>${deal.temperature}°,</span>
+        <span>${deal.published}</span>
+      </div>
+    `;
+    })
+    .join('');
+
+  div.innerHTML = template;
+  fragment.appendChild(div);
+  favoriteSection.innerHTML = '<h2>Favorite Deals</h2>';
+  favoriteSection.appendChild(fragment);
+};
+
