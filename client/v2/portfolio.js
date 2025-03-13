@@ -81,7 +81,7 @@ const renderDeals = deals => {
       return `
       <div class="deal" id=${deal.uuid}>
         <span>${deal.id}</span>
-        <a href="${deal.link}">${deal.title}</a>
+        <a href="${deal.link}" target="_blank">${deal.title}</a>
         <span>${deal.price}€,</span>
         <span>${deal.discount}% off,</span>
         <span>${deal.comments} comments,</span>
@@ -514,3 +514,7 @@ function calculateLifetimeValue(sales) {
 
   return totalDays / sales.length;
 }
+
+
+// Feature 11 - Open product link
+// ajout de target="_blank" à renderDeals pour ouvrir dans un nouvel onglet
