@@ -74,10 +74,13 @@ const fetchDeals = async (page = 1, size = 6) => {
  * @param {Array} deals
  */
 const renderDeals = deals => {
+  const dealsToRender = showOnlyFavorites ? favoriteDeals : deals;
+
   const fragment = document.createDocumentFragment();
   const div = document.createElement('div');
-  const template = deals
+  const template = dealsToRender
     .map(deal => {
+      const isFavorite = favoriteDeals.some(fav => fav.uuid === deal.uuid);
       return `
       <div class="deal" id=${deal.uuid}>
         <span>${deal.id}</span>
@@ -87,7 +90,7 @@ const renderDeals = deals => {
         <span>${deal.comments} comments,</span>
         <span>${deal.temperature}°,</span>
         <span>${deal.published}</span>
-        <button class="favorite-btn" data-id="${deal.uuid}">❤️</button>
+        <button class="favorite-btn" data-id="${deal.uuid}">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button>
       </div>
     `;
     })
@@ -588,4 +591,21 @@ const renderFavorites = () => {
   favoriteSection.innerHTML = '<h2>Favorite Deals</h2>';
   favoriteSection.appendChild(fragment);
 };
+
+
+// Feature 14 - Filter by favorite
+let showOnlyFavorites = false;
+
+document.querySelector('#filter-favorites-btn').addEventListener('click', () => {
+  showOnlyFavorites = !showOnlyFavorites;
+  renderDeals(currentDeals);
+});
+
+
+
+
+
+
+
+
 
