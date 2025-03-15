@@ -1,57 +1,60 @@
-import * as dealabs from './websites/dealabs';
-import * as vinted from './websites/vinted';
-import * as avenueDeLaBrique from './websites/avenuedelabrique';
+
+
+
+import * as dealabs from './websites/dealabs.js';
+import * as vinted from './websites/vinted.js';
+import * as avenueDeLaBrique from './websites/avenuedelabrique.js';
+
 import * as fs from 'fs';
 import Queue from 'p-queue';
 import delay from 'delay';
 
 
-const vinted = require('./websites/vinted');
+//const vinted = require('./websites/vinted');
 const SCRAPPED_DEALS = JSON.parse(fs.readFileSync('dealabsDeals.json', 'utf8'));
 
-const START_DATE = new Date(2024, 8, 15);
-const END_DATE = new Date();
 
-function padTo2Digits (num)
-{
-
-}
-
-
-
-async function start (){
-
-}
-
-
-const queue = new Queue({'concurrency': 1});
+const queue = new Queue({ concurrency: 1 });
 const LEGO_SET_IDS = [
-    '42182', '60363', '43231', '75403', '75404', '21034', '42635',
-    '75404', '76266', '72176', '42635', '71460', '42202', '40524',
-    '75402', '76262'
-  
-  ]
+  '42182', '60363', '43231', '75403',
+  '75404', '21034', '42635',
+  '75405', '76266', '42176', '42635',
+  '71460', '42202', '40524',
+  '75402', '76262', '77051', '71387',
+  '76303', '21333', '43224', '10363',
+  '60373', '72032', '75332', '76959',
+  '76969', '40460'
+];
 let SALES = {};
 
-async function goVinted(){
-    console.log(`Start with ${LEGO_SET_IDS.length} lego sets ...`)
-    
-    for (const id of LEGO_SET_IDS){
-        queue.add(async () => {
-            console.log(`browsing ${id} website`)
-            let results = await goVinted.scrape(id);
+async function goVinted() {
+  console.log(`Start with ${LEGO_SET_IDS.length} lego sets ...`);
 
-            SALES[id] = results;
-            console.log("waiting...");
-            await delay(5000)  
-        });
-    };
+  for (const id of LEGO_SET_IDS) {
+    queue.add(async () => {
+      console.log(`browsing ${id} website`);
+      let results = await vinted.scrape(id);
 
-    await queue.onIdle();
-    console.log(Object.keys(SALES).length);
-    fstat.writeFileSync('vinted-for-client-v2.json', JSON.stringify(SALES));
-    console.log('done');
+      if (results) {
+        SALES[id] = results;
+        console.log(`Results for ${id}:`, results);
+      } else {
+        console.error(`No results for ${id}`);
+      }
+
+      console.log("waiting...");
+      await delay(5000);
+    });
+  }
+
+  await queue.onIdle();
+  console.log(`Total sales found: ${Object.keys(SALES).length}`);
+  fs.writeFileSync('vinted-for-client-v2.json', JSON.stringify(SALES, null, 2));
+  console.log('done');
+  console.log(SALES); // Affiche les résultats
 }
+
+goVinted();
 
 
 
@@ -81,7 +84,7 @@ sandbox(eshop); */
 const fs = require('fs');
 const dealabs = require('./websites/dealabs');
 
-async function sandbox(website = 'https://www.dealabs.com/') {
+async function sandbox(website = 'https://www.dealabs.com/search?q=lego') {
   try {
     console.log(`🕵️‍♀️  browsing ${website} website`);
 
