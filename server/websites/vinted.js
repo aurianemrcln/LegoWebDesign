@@ -1,7 +1,5 @@
 import { v5 as uuidv5 } from 'uuid';
 
-//const { title } = require("process");
-
 const parse = data => {
     try {
       const { items } = data;
@@ -79,26 +77,3 @@ const parse = data => {
   };
   
   export { scrape };
-
-
-
-
-
-
-
-/*
-const scrapeWithNoCookies = async searchText=> {
-    try{
-
-
-
-
-    console.error(response);
-
-    return null;
-    }
-    catch (error){
-        console.error(error);
-        return null;
-    }
-}*/

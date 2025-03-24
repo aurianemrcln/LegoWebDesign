@@ -1,6 +1,3 @@
-
-
-
 import * as dealabs from './websites/dealabs.js';
 import * as vinted from './websites/vinted.js';
 import * as avenueDeLaBrique from './websites/avenuedelabrique.js';
@@ -8,10 +5,6 @@ import * as avenueDeLaBrique from './websites/avenuedelabrique.js';
 import * as fs from 'fs';
 import Queue from 'p-queue';
 import delay from 'delay';
-
-
-//const vinted = require('./websites/vinted');
-const SCRAPPED_DEALS = JSON.parse(fs.readFileSync('dealabsDeals.json', 'utf8'));
 
 
 const queue = new Queue({ concurrency: 1 });
@@ -49,7 +42,7 @@ async function goVinted() {
 
   await queue.onIdle();
   console.log(`Total sales found: ${Object.keys(SALES).length}`);
-  fs.writeFileSync('vinted-for-client-v2.json', JSON.stringify(SALES, null, 2));
+  fs.writeFileSync('vintedSales.json', JSON.stringify(SALES, null, 2));
   console.log('done');
   console.log(SALES); // Affiche les résultats
 }
