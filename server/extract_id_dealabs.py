@@ -12,17 +12,21 @@ def update_id_with_title_number(deal):
     if match:
         # Mettre à jour l'id avec le numéro trouvé
         deal['id'] = match.group(0)
+        return True
+    return False
 
-# Appliquer la fonction à chaque élément de la liste (si c'est une liste)
+# Filtrer les deals qui ont un numéro à 5 chiffres dans le titre
 if isinstance(data, list):
-    for deal in data:
-        update_id_with_title_number(deal)
+    data = [deal for deal in data if update_id_with_title_number(deal)]
 else:
-    # Si c'est un seul objet JSON
-    update_id_with_title_number(data)
+    # Si c'est un seul objet JSON et qu'il n'a pas de numéro à 5 chiffres, on le supprime
+    if not update_id_with_title_number(data):
+        data = None
 
 # Enregistrer les modifications dans un nouveau fichier JSON
-with open('dealabsDeals_updated.json', 'w', encoding='utf-8') as file:
-    json.dump(data, file, ensure_ascii=False, indent=4)
-
-print("Le fichier a été mis à jour avec succès.")
+if data:
+    with open('dealabsDeals_updated.json', 'w', encoding='utf-8') as file:
+        json.dump(data, file, ensure_ascii=False, indent=4)
+    print("Le fichier a été mis à jour avec succès.")
+else:
+    print("Aucun deal valide n'a été trouvé.")
