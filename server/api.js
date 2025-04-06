@@ -21,21 +21,22 @@ app.get('/', (request, response) => {
   response.send({'ack': true});
 });
 
-// Route pour récupérer un deal spécifique
-app.get('/deals/:id', async (request, response) => {
+/*
+// Route pour récupérer un deal par son _id
+app.get('/deals/:_id', async (request, response) => {
   try {
     await client.connect();
     const db = client.db('Lego');
     const dealsCollection = db.collection('deals');
-    const dealId = request.params.id;
+    const dealId = request.params._id;
 
     // Utilisez find pour obtenir tous les deals correspondant à l'ID
-    const deals = await dealsCollection.find({ id: dealId }, { projection: { _id: 0 } }).toArray();
+    const deals = await dealsCollection.find({ _id: new ObjectId(dealId) }).toArray();
 
     if (deals.length > 0) {
       response.json(deals);
     } else {
-      response.status(404).send('No deals found');
+      response.status(404).send('No deals found1');
     }
   } catch (error) {
     console.error('Error fetching deals:', error);
@@ -43,52 +44,90 @@ app.get('/deals/:id', async (request, response) => {
   } finally {
     await client.close();
   }
-});
+});*/
 
-// Route pour récupérer les ventes pour un set LEGO donné
-app.get('/sales/:legoSetId', async (request, response) => {
-  try {
-    await client.connect();
-    const db = client.db('Lego');
-    const sales = db.collection('sales');
-    const legoSetId = request.params.legoSetId;
-    const salesList = await sales.find({ legoSetId })
-      .project({ _id: 0 })
-      .toArray();
-    response.json(salesList);
-  } catch (error) {
-    response.status(500).send('Internal Server Error');
-  } finally {
-    await client.close();
-  }
-});
-
-// Route pour rechercher des deals
+// Route pour rechercher des deals avec des paramètres de requête
 app.get('/deals/search', async (request, response) => {
+  const {
+    limit = 10,
+    _id,
+    legoSetId,
+    pricemin,
+    pricemax,
+    commentsmin,
+    commentsmax,
+    tempmin,
+    tempmax,
+    discountmin,
+    discountmax,
+    retailmin,
+    retailmax,
+    datemin
+  } = request.query;
+  const query = {};
+
+  if (_id) { query._id = _id; }
+  if (legoSetId) { query.legoSetId = legoSetId; }
+  if (pricemax) query.price = { $lte: parseFloat(pricemax) };
+  if (pricemin) query.price = { $gte: parseFloat(pricemin) };
+  if (commentsmax) query.comments = { $lte: parseFloat(commentsmax) };
+  if (commentsmin) query.comments = { $gte: parseFloat(commentsmin) };
+  if (tempmax) query.temperature = { $lte: parseFloat(tempmax) };
+  if (tempmin) query.temperature = { $gte: parseFloat(tempmin) };
+  if (discountmin) query.discount = { $gte: parseFloat(discountmin) };
+  if (discountmax) query.discount = { $lte: parseFloat(discountmax) };
+  if (retailmin) query.retail = { $gte: parseFloat(retailmin) };
+  if (retailmax) query.retail = { $lte: parseFloat(retailmax) };
+  if (datemin) query.published = { $gte: new Date(datemin).getTime() / 1000 };
+
   try {
     await client.connect();
     const db = client.db('Lego');
-    const deals = db.collection('deals');
-    const { limit, price, date, filterBy } = request.query;
+    const dealsCollection = db.collection('deals');
 
-    let query = {};
-    if (price) query.price = { $lte: parseFloat(price) };
-    if (date) query.published = { $gte: new Date(date) };
-
-    const dealsList = await deals.find(query)
-      .sort(filterBy || { published: -1 })
-      .limit(limit ? parseInt(limit) : 10)
-      .project({ _id: 0 })
+    const deals = await dealsCollection.find(query)
+      .sort({ price: 1 })
+      .limit(parseInt(limit))
       .toArray();
 
-    response.json(dealsList);
+    response.json({ limit: parseInt(limit), total: deals.length, results: deals });
   } catch (error) {
+    console.error('Error searching deals:', error);
     response.status(500).send('Internal Server Error');
   } finally {
     await client.close();
   }
 });
 
+// Route pour rechercher des ventes Vinted
+app.get('/sales/search', async (request, response) => {
+  const { limit = 10, legoSetId } = request.query;
+  const query = {};
+
+  // Filtrer par legoSetId si fourni
+  if (legoSetId) {
+    query.legoSetId = legoSetId;
+  }
+
+  try {
+    await client.connect();
+    const db = client.db('Lego');
+    const salesCollection = db.collection('sales');
+
+    // Récupérer les ventes correspondant au legoSetId
+    const sales = await salesCollection.find(query)
+      .sort({ price: 1 })
+      .limit(parseInt(limit))
+      .toArray();
+
+    response.json({ limit: parseInt(limit), total: sales.length, results: sales });
+  } catch (error) {
+    console.error('Error searching sales:', error);
+    response.status(500).send('Internal Server Error');
+  } finally {
+    await client.close();
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`📡 Running on port ${PORT}`);
