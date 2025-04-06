@@ -20,12 +20,12 @@ async function insertSales() {
             ...sale,
             legoSetId // Ajout de l'ID du set LEGO à chaque vente
         }));
-        console.log('📜 Ventes pour le set LEGO', legoSetId, ':', salesList.length);
+        // console.log('📜 Ventes pour le set LEGO', legoSetId, ':', salesList.length);
         sales.push(...salesList);
     }
 
     // Vérifier si les données sont bien un tableau
-    console.log('📜 Données transformées pour MongoDB:', sales);
+    //console.log('📜 Données transformées pour MongoDB:', sales);
 
     if (!Array.isArray(sales)) {
         console.error('❌ Erreur : sales n\'est pas un tableau');

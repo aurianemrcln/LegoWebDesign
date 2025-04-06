@@ -10,6 +10,8 @@ def update_id_with_title_number(deal):
     # Utiliser une expression régulière pour trouver un numéro à 5 chiffres dans le titre
     match = re.search(r'\b\d{5}\b', deal['title'])
     if match:
+        # Renommer l'id actuel en _id
+        deal['_id'] = deal.pop('id')
         # Mettre à jour l'id avec le numéro trouvé
         deal['id'] = match.group(0)
         return True
@@ -25,7 +27,7 @@ else:
 
 # Enregistrer les modifications dans un nouveau fichier JSON
 if data:
-    with open('dealabsDeals_updated.json', 'w', encoding='utf-8') as file:
+    with open('./server/dealabsDeals_updated.json', 'w', encoding='utf-8') as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
     print("Le fichier a été mis à jour avec succès.")
 else:

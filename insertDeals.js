@@ -6,9 +6,18 @@ async function insertDeals() {
     const deals = JSON.parse(fs.readFileSync('./server/dealabsDeals_updated.json', 'utf8'));
 
     const collection = db.collection('deals');
-    const result = await collection.insertMany(deals);
-    
-    console.log(`Inserted ${result.insertedCount} deals`);
+    let insertedCount = 0;
+
+    for (const deal of deals) {
+        const existingDeal = await collection.findOne({ _id: deal._id });
+
+        if (!existingDeal) {
+            await collection.insertOne(deal);
+            insertedCount++;
+        }
+    }
+
+    console.log(`Inserted ${insertedCount} deals`);
 }
 
 insertDeals().catch(console.error);

@@ -77,14 +77,23 @@ sandbox(eshop); */
 const fs = require('fs');
 const dealabs = require('./websites/dealabs');
 
-async function sandbox(website = 'https://www.dealabs.com/search?q=lego') {
+async function sandbox(baseUrl = 'https://www.dealabs.com/search?q=lego') {
   try {
-    console.log(`🕵️‍♀️  browsing ${website} website`);
+    console.log(`🕵️‍♀️  browsing ${baseUrl} website`);
 
-    const deals = await dealabs.scrape(website);
+    const allDeals = [];
+    const pagesToScrape = 100;
+
+    for (let page = 1; page <= pagesToScrape; page++) {
+      const url = `${baseUrl}&page=${page}`;
+      // console.log(`Scraping page ${page}: ${url}`);
+
+      const deals = await dealabs.scrape(url);
+      allDeals.push(...deals);
+    }
 
     // Écrire les deals dans un fichier JSON
-    fs.writeFileSync('dealabsDeals.json', JSON.stringify(deals, null, 2));
+    fs.writeFileSync('dealabsDeals.json', JSON.stringify(allDeals, null, 2));
 
     console.log('Deals have been saved to dealabsDeals.json');
     console.log('done');
@@ -94,6 +103,7 @@ async function sandbox(website = 'https://www.dealabs.com/search?q=lego') {
     process.exit(1);
   }
 }
+
 const [,, eshop] = process.argv;
 sandbox(eshop);
 */
