@@ -26,14 +26,36 @@ app.get('/deals/:id', async (request, response) => {
   try {
     await client.connect();
     const db = client.db('Lego');
-    const deals = db.collection('deals');
+    const dealsCollection = db.collection('deals');
     const dealId = request.params.id;
-    const deal = await deals.findOne({ id: dealId }, { projection: { _id: 0 } });
-    if (deal) {
-      response.json(deal);
+
+    // Utilisez find pour obtenir tous les deals correspondant à l'ID
+    const deals = await dealsCollection.find({ id: dealId }, { projection: { _id: 0 } }).toArray();
+
+    if (deals.length > 0) {
+      response.json(deals);
     } else {
-      response.status(404).send('Deal not found');
+      response.status(404).send('No deals found');
     }
+  } catch (error) {
+    console.error('Error fetching deals:', error);
+    response.status(500).send('Internal Server Error');
+  } finally {
+    await client.close();
+  }
+});
+
+// Route pour récupérer les ventes pour un set LEGO donné
+app.get('/sales/:legoSetId', async (request, response) => {
+  try {
+    await client.connect();
+    const db = client.db('Lego');
+    const sales = db.collection('sales');
+    const legoSetId = request.params.legoSetId;
+    const salesList = await sales.find({ legoSetId })
+      .project({ _id: 0 })
+      .toArray();
+    response.json(salesList);
   } catch (error) {
     response.status(500).send('Internal Server Error');
   } finally {
@@ -67,23 +89,6 @@ app.get('/deals/search', async (request, response) => {
   }
 });
 
-// Route pour récupérer les ventes pour un ensemble LEGO donné
-app.get('/sales/:legoSetId', async (request, response) => {
-  try {
-    await client.connect();
-    const db = client.db('Lego');
-    const sales = db.collection('sales');
-    const legoSetId = request.params.legoSetId;
-    const salesList = await sales.find({ legoSetId })
-      .project({ _id: 0 })
-      .toArray();
-    response.json(salesList);
-  } catch (error) {
-    response.status(500).send('Internal Server Error');
-  } finally {
-    await client.close();
-  }
-});
 
 app.listen(PORT, () => {
   console.log(`📡 Running on port ${PORT}`);
